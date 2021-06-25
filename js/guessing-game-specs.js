@@ -34,11 +34,19 @@ describe('shuffle function', () => {
   });
 });
 
-describe('Game class', () => {
+describe('newGame function', () => {
   let game;
 
   beforeEach(() => {
-    game = new Game();
+    game = newGame();
+  });
+
+  it('returns a new game object each time it is called', () => {
+    game1 = newGame(); // newGame returns a game object
+    game2 = newGame();
+    expect(typeof game1).toBe('object');
+    expect(typeof game2).toBe('object');
+    expect(game1 === game2).toEqual(false);
   });
 
   it('should have a playersGuess property, and a pastGuesses property ', () => {
@@ -51,11 +59,10 @@ describe('Game class', () => {
 
   it('should have a winningNumber property, which calls generateWinningNumber', () => {
     // note: generateWinningNumber is a function in the global scope
-    game = new Game();
     expect(typeof game.winningNumber).toBe('number');
   });
 
-  describe('methods on the game class `.prototype`', () => {
+  describe('game object methods', () => {
     describe('difference ', () => {
       it('returns the absolute value of the difference between the playersGuess and winningNumber', () => {
         game.playersGuess = 20;
@@ -96,9 +103,9 @@ describe('Game class', () => {
         }).toThrow('That is an invalid guess.');
       });
       it('calls checkGuess', () => {
-        spyOn(Game.prototype, 'checkGuess');
+        spyOn(game, 'checkGuess');
         game.playersGuessSubmission(42);
-        expect(Game.prototype.checkGuess).toHaveBeenCalled();
+        expect(game.checkGuess).toHaveBeenCalled();
       });
     });
 
@@ -110,7 +117,7 @@ describe('Game class', () => {
         let result = game.playersGuessSubmission(42);
         expect(typeof result).toBe('string');
       });
-      it('returns "You Win!" if playersGuess equals winningNumber', () => {
+      it('returns "You Win!" if playersGuess equals winningGuess', () => {
         game.winningNumber = 42;
         expect(game.playersGuessSubmission(42)).toBe('You Win!');
       });
@@ -154,7 +161,7 @@ describe('Game class', () => {
 
     describe('newGame function', () => {
       it('returns an empty, new game instance', () => {
-        game = newGame(); // newGame calls new Game() and returns the new instance
+        game = newGame(); // newGame returns a game object
         expect(game.playersGuess).toEqual(null);
         expect(game.pastGuesses.length).toEqual(0);
       });
@@ -175,7 +182,7 @@ describe('Game class', () => {
         game.provideHint();
         expect(generateWinningNumber.calls.count()).toBe(2);
       });
-      it('calls the shuffle function', function() {
+      it('calls the shuffle function', function () {
         spyOn(window, 'shuffle'); // note: in order to pass this spec, shuffle needs to be defined
         // with a function declaration, ex: function shuffle() {}
         game.provideHint();
